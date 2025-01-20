@@ -38,7 +38,7 @@ yarn add @xstd/mime-type
 npm install @xstd/mime-type --save
 ```
 
-## 📑 Documentation
+## 📃 Documentation
 
 ```ts
 /**

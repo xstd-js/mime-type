@@ -57,7 +57,7 @@ export class MIMETypeParameters {
     this.#parameters = [];
 
     if (init !== undefined) {
-      this.#from(init);
+      this.#from(init, { mode: 'append' });
     }
   }
 

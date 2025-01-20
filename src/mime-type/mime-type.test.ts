@@ -68,10 +68,10 @@ describe('MIMEType', () => {
     it('should throw if set properties are invalid', () => {
       const mimeType = new MIMEType('text/plain');
 
-      expect(() => mimeType.type = '').toThrow();
-      expect(() => mimeType.type = '@application').toThrow();
-      expect(() => mimeType.subtype = '').toThrow();
-      expect(() => mimeType.subtype = '@json').toThrow();
+      expect(() => (mimeType.type = '')).toThrow();
+      expect(() => (mimeType.type = '@application')).toThrow();
+      expect(() => (mimeType.subtype = '')).toThrow();
+      expect(() => (mimeType.subtype = '@json')).toThrow();
     });
   });
 

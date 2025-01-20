@@ -62,17 +62,19 @@ describe('MIMETypeParameters', () => {
 
       it('throws with an invalid key/value object', () => {
         // invalid key
-        expect(() =>
-          new MIMETypeParameters({
-            '@': 'b',
-          }),
+        expect(
+          () =>
+            new MIMETypeParameters({
+              '@': 'b',
+            }),
         ).toThrow();
 
         // invalid value
-        expect(() =>
-          new MIMETypeParameters({
-            a: '\u0000',
-          }),
+        expect(
+          () =>
+            new MIMETypeParameters({
+              a: '\u0000',
+            }),
         ).toThrow();
       });
     });
@@ -96,7 +98,11 @@ describe('MIMETypeParameters', () => {
 
       it('returns false when providing a INVALID parameter in a string as input', () => {
         expect(MIMETypeParameters.canParse('invalid')).toBe(false);
-        expect(MIMETypeParameters.canParse('invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid')).toBe(false);
+        expect(
+          MIMETypeParameters.canParse(
+            'invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid-invalid',
+          ),
+        ).toBe(false);
       });
     });
   });
@@ -134,7 +140,6 @@ describe('MIMETypeParameters', () => {
         expect(() => mimeType.append('a', '\u0000')).toThrow();
       });
     });
-
 
     describe('.delete(...)', () => {
       let mimeType: MIMETypeParameters;
@@ -257,7 +262,6 @@ describe('MIMETypeParameters', () => {
       });
     });
 
-
     describe('.sort(...)', () => {
       it('should be able to sort parameters', () => {
         {
@@ -283,35 +287,53 @@ describe('MIMETypeParameters', () => {
     describe('.keys(...)', () => {
       it('should return parameter keys', () => {
         expect(Array.from(new MIMETypeParameters('').keys())).toEqual([]);
-        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1').keys())).toEqual(['a', 'a', 'b']);
+        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1').keys())).toEqual([
+          'a',
+          'a',
+          'b',
+        ]);
       });
     });
 
     describe('.values(...)', () => {
       it('should return parameter values', () => {
         expect(Array.from(new MIMETypeParameters('').values())).toEqual([]);
-        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1').values())).toEqual(['a1', 'a2', 'b1']);
+        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1').values())).toEqual([
+          'a1',
+          'a2',
+          'b1',
+        ]);
       });
     });
 
     describe('.entries(...)', () => {
       it('should return parameter entries', () => {
         expect(Array.from(new MIMETypeParameters('').entries())).toEqual([]);
-        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1').entries())).toEqual([['a', 'a1'], ['a', 'a2'], ['b', 'b1']]);
+        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1').entries())).toEqual([
+          ['a', 'a1'],
+          ['a', 'a2'],
+          ['b', 'b1'],
+        ]);
       });
     });
 
     describe('[Symbol.iterator](...)', () => {
       it('should return parameter entries', () => {
-        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1')[Symbol.iterator]())).toEqual([['a', 'a1'], ['a', 'a2'], ['b', 'b1']]);
+        expect(Array.from(new MIMETypeParameters('; a=a1; a=a2; b=b1')[Symbol.iterator]())).toEqual(
+          [
+            ['a', 'a1'],
+            ['a', 'a2'],
+            ['b', 'b1'],
+          ],
+        );
       });
     });
 
     describe('forEach(...)', () => {
       it('should iterate on entries', () => {
-      const spy = vi.fn();
-       const mimeType = new MIMETypeParameters('; a=a1; a=a2; b=b1');
-        mimeType.forEach(spy)
+        const spy = vi.fn();
+        const mimeType = new MIMETypeParameters('; a=a1; a=a2; b=b1');
+        mimeType.forEach(spy);
         expect(spy).toHaveBeenCalledTimes(3);
         expect(spy).toHaveBeenNthCalledWith(1, 'a', 'a1', mimeType);
         expect(spy).toHaveBeenNthCalledWith(2, 'a', 'a2', mimeType);

@@ -5,9 +5,10 @@ export default defineConfig({
     dir: 'src',
     coverage: {
       include: ['src/**/*.ts'],
+      exclude: ['src/**/types/**/*.ts'],
       thresholds: {
         100: true,
       },
-    }
+    },
   },
 });
