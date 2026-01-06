@@ -59,8 +59,31 @@ declare class MIMEType {
    * Constructs a new MIMEType from an input string.
    *
    * Throws if the `input` is not a valid MIME type.
+   * 
+   * @example
+   * 
+   * const mimeType = new MIMEType('text/plain; encoding=utf-8');
    */
   constructor(input: string);
+
+  /* IMMUTABLE */
+
+  /**
+   * Throws if this object is immutable.
+   */
+  throwIfImmutable(): void;
+
+  /**
+   * Returns `true` if this object is immutable.
+   */
+  get immutable(): boolean;
+
+  /**
+   * Makes this object immutable.
+   */
+  makeImmutable(): this;
+  
+  /* PROPERTIES */
   
   /**
    * Returns the type of this MIMEType.
@@ -85,6 +108,19 @@ declare class MIMEType {
    * Throws if the `input` is not a valid subtype.
    */
   set subtype(input: string);
+
+  /**
+   * Returns the type and subtype of this MIMEType.
+   */
+  get typeAndSubtype(): string;
+
+  /**
+   * Sets the type and subtype of this MIMEType.
+   *
+   * Throws if the `input` is not a valid MIMEType.
+   */
+  set typeAndSubtype(input: string);
+  
   
   /**
    * Returns the parameters of this MIMEType.
@@ -138,12 +174,30 @@ declare class MIMETypeParameters {
      * > If the `input` is a string, the leading separator `;` bay be omitted.
      *
      * @example
-     * ```ts
+     * 
      * const parameters = new MIMETypeParameters('; encoding=utf-8');
-     * ```
      */
     constructor(init?: MIMETypeParametersInit);
-    
+
+    /* IMMUTABLE */
+
+    /**
+     * Throws if this object is immutable.
+     */
+    throwIfImmutable(): void;
+  
+    /**
+     * Returns `true` if this object is immutable.
+     */
+    get immutable(): boolean;
+  
+    /**
+     * Makes this object immutable.
+     */
+    makeImmutable(): this;
+  
+    /* MAP LIKE */
+  
     /**
      * Returns the number of parameters.
      */
@@ -152,23 +206,32 @@ declare class MIMETypeParameters {
     /**
      * Appends a specified key/value pair as a new parameter.
      */
-    append(key: string, value: string): void;
+    append(key: string, value: string): this;
+
+  /**
+   * Deletes specified parameters and their associated value(s) from the list of all parameters.
+   *
+   * @returns The number of deleted parameters.
+   */
+    delete(key: string, value?: string): number;
     
     /**
-     * Deletes specified parameters and their associated value(s) from the list of all parameters.
+     * Returns the first value associated with the given parameter.
+     * 
+     * Throws if the parameter doesn't exist.
      */
-    delete(key: string, value?: string): void;
-    
-    /**
-     * Returns the first value associated to the given parameter.
-     */
-    get(key: string): string | null;
+    get(key: string): string;
     
     /**
      * Returns all the values associated with a given parameter as an array.
      */
     getAll(key: string): string[];
-    
+
+    /**
+     * Returns the first value associated with the given parameter, or `undefined` if there is none.
+     */
+    getOptional(key: string): string | undefined;
+  
     /**
      * Returns a boolean value that indicates whether the specified parameter is in the parameters.
      */
@@ -179,7 +242,7 @@ declare class MIMETypeParameters {
      * If there were several matching values, this method deletes the others.
      * If the parameter doesn't exist, this method creates it.
      */
-    set(key: string, value: string): void;
+    set(key: string, value: string): this;
     
     /**
      * Removes all the parameters.
@@ -191,7 +254,7 @@ declare class MIMETypeParameters {
      * The sort order is according to unicode code points of the keys.
      * This method uses a stable sorting algorithm (i.e. the relative order between key/value pairs with equal keys will be preserved).
      */
-    sort(): void;
+    sort(): this;
     
     /**
      * Returns an `Iterator` allowing iteration through all keys contained in this object.

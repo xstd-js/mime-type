@@ -1,11 +1,16 @@
-import { MIMETypeParameters } from '../mime-type-parameters/mime-type-parameters.js';
+import { WithImmutability } from '@xstd/with-immutability';
+import { MIMETypeParameters } from '../mime-type-parameters/mime-type-parameters.ts';
+
+/* TYPES */
+
+export type MIMETypeSource = string | MIMEType;
 
 /* CLASS */
 
 /**
  * Represents a MIME type.
  */
-export class MIMEType {
+export class MIMEType extends WithImmutability {
   /**
    * Returns `true` if `input` can be parsed into a valid MIME type.
    */
@@ -24,6 +29,13 @@ export class MIMEType {
     }
   }
 
+  /**
+   * If `input` is a `MIMEType`, returns it, else returns a new `MIMEType` instance based on `input`.
+   */
+  static of(input: MIMETypeSource): MIMEType {
+    return input instanceof MIMEType ? input : new MIMEType(input);
+  }
+
   #type: string;
   #subtype: string;
   readonly #parameters: MIMETypeParameters;
@@ -39,6 +51,11 @@ export class MIMEType {
    * ```
    */
   constructor(input: string) {
+    super();
+
+    this.#type = '';
+    this.#subtype = '';
+
     let typeAndSubtype: string, parameters: string;
 
     const indexOfParameters: number = input.indexOf(';');
@@ -51,20 +68,12 @@ export class MIMEType {
       parameters = input.slice(indexOfParameters);
     }
 
-    const indexOfSubtype: number = typeAndSubtype.indexOf('/');
-
-    if (indexOfSubtype === -1) {
-      throw new Error('Invalid MimeType: missing subtype.');
-    }
-
-    this.#type = '';
-    this.#subtype = '';
-
-    this.type = typeAndSubtype.slice(0, indexOfSubtype);
-    this.subtype = typeAndSubtype.slice(indexOfSubtype + 1);
+    this.typeAndSubtype = typeAndSubtype;
 
     this.#parameters = new MIMETypeParameters(parameters);
   }
+
+  /* PROPERTIES */
 
   /**
    * Returns the type of this MIMEType.
@@ -79,11 +88,9 @@ export class MIMEType {
    * Throws if the `input` is not a valid type.
    */
   set type(input: string) {
-    if (MIMETypeTypeRegExp.test(input)) {
-      this.#type = input;
-    } else {
-      throw new Error(`Invalid type: ${input}`);
-    }
+    this.throwIfImmutable();
+    validateMIMETypeType(input);
+    this.#type = input;
   }
 
   /**
@@ -99,11 +106,40 @@ export class MIMEType {
    * Throws if the `input` is not a valid subtype.
    */
   set subtype(input: string) {
-    if (MIMETypeSubtypeRegExp.test(input)) {
-      this.#subtype = input;
-    } else {
-      throw new Error(`Invalid subtype: ${input}`);
+    this.throwIfImmutable();
+    validateMIMETypeSubtype(input);
+    this.#subtype = input;
+  }
+
+  /**
+   * Returns the type and subtype of this MIMEType.
+   */
+  get typeAndSubtype(): string {
+    return `${this.#type}/${this.#subtype}`;
+  }
+
+  /**
+   * Sets the type and subtype of this MIMEType.
+   *
+   * Throws if the `input` is not a valid MIMEType.
+   */
+  set typeAndSubtype(input: string) {
+    this.throwIfImmutable();
+
+    const index: number = input.indexOf('/');
+
+    if (index === -1) {
+      throw new Error('Invalid MimeType: missing subtype.');
     }
+
+    const type: string = input.slice(0, index);
+    validateMIMETypeType(type);
+
+    const subtype: string = input.slice(index + 1);
+    validateMIMETypeSubtype(subtype);
+
+    this.#type = type;
+    this.#subtype = subtype;
   }
 
   /**
@@ -116,7 +152,7 @@ export class MIMEType {
   /**
    * Returns a MIME type string.
    */
-  toString(): string {
+  override toString(): string {
     return `${this.#type}/${this.#subtype}${this.#parameters.toString({ includeLeadingSeparator: true })}`;
   }
 }
@@ -127,3 +163,15 @@ const TOKEN_PATTERN = "[0-9a-zA-Z\\!\\#\\$\\%\\&'\\*\\+\\-\\.\\^_\\`\\|\\~]";
 
 const MIMETypeTypeRegExp = new RegExp(`^${TOKEN_PATTERN}+$`);
 const MIMETypeSubtypeRegExp = new RegExp(`^${TOKEN_PATTERN}+$`);
+
+function validateMIMETypeType(type: string): void {
+  if (!MIMETypeTypeRegExp.test(type)) {
+    throw new Error(`Invalid type: ${type}`);
+  }
+}
+
+function validateMIMETypeSubtype(subtype: string): void {
+  if (!MIMETypeSubtypeRegExp.test(subtype)) {
+    throw new Error(`Invalid subtype: ${subtype}`);
+  }
+}

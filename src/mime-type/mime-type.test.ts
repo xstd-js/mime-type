@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MIMEType } from './mime-type.js';
+import { MIMEType } from './mime-type.ts';
 
 describe('MIMEType', () => {
   describe('new(...)', () => {
@@ -43,6 +43,19 @@ describe('MIMEType', () => {
         expect(MIMEType.canParse('invalid')).toBe(false);
       });
     });
+
+    describe('.of(...)', () => {
+      it('returns expected instance', () => {
+        const mimeTypeA: MIMEType = new MIMEType('text/plain');
+
+        expect(MIMEType.of(mimeTypeA)).toBe(mimeTypeA);
+
+        const mimeTypeB: MIMEType = MIMEType.of('text/plain');
+
+        expect(mimeTypeB.toString()).toBe('text/plain');
+        expect(mimeTypeB).not.toBe(mimeTypeA);
+      });
+    });
   });
 
   describe('properties', () => {
@@ -51,6 +64,7 @@ describe('MIMEType', () => {
 
       expect(mimeType.type).toBe('text');
       expect(mimeType.subtype).toBe('plain');
+      expect(mimeType.typeAndSubtype).toBe('text/plain');
       expect(mimeType.parameters.get('encoding')).toBe('utf-8');
     });
 
@@ -62,7 +76,12 @@ describe('MIMEType', () => {
 
       expect(mimeType.type).toBe('application');
       expect(mimeType.subtype).toBe('json');
+      expect(mimeType.typeAndSubtype).toBe('application/json');
       expect(mimeType.toString()).toBe('application/json');
+
+      mimeType.typeAndSubtype = 'text/plain';
+      expect(mimeType.typeAndSubtype).toBe('text/plain');
+      expect(mimeType.toString()).toBe('text/plain');
     });
 
     it('should throw if set properties are invalid', () => {
@@ -83,6 +102,15 @@ describe('MIMEType', () => {
           'text/plain; encoding=utf-8',
         );
       });
+    });
+  });
+
+  describe('immutability', () => {
+    it('should throw when updating an immutable MIMEType', () => {
+      const mimeType = new MIMEType('text/plain').makeImmutable();
+
+      expect(mimeType.immutable).toBe(true);
+      expect(() => (mimeType.subtype = 'html')).toThrow();
     });
   });
 });
