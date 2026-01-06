@@ -73,6 +73,13 @@ export class MIMEType extends WithImmutability {
     this.#parameters = new MIMETypeParameters(parameters);
   }
 
+  /* IMMUTABILITY */
+
+  override makeImmutable(): this {
+    this.#parameters.makeImmutable();
+    return super.makeImmutable();
+  }
+
   /* PROPERTIES */
 
   /**

@@ -111,6 +111,8 @@ describe('MIMEType', () => {
 
       expect(mimeType.immutable).toBe(true);
       expect(() => (mimeType.subtype = 'html')).toThrow();
+
+      expect(mimeType.parameters.immutable).toBe(true);
     });
   });
 });
